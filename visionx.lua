@@ -32,7 +32,7 @@ local GREEN, OFFC = Color3.fromRGB(52, 199, 89), Color3.fromRGB(46, 46, 54)
 local Q, B = Enum.EasingStyle.Quint, Enum.EasingStyle.Back
 local OUT, IN = Enum.EasingDirection.Out, Enum.EasingDirection.In
 
-local VERSION = "V12"
+local VERSION = "V13"
 local ANIM = 1
 local function tw(o, t, props, style, dir)
 	local tween = TweenService:Create(o, TweenInfo.new(t / ANIM, style or Q, dir or OUT), props)
@@ -84,11 +84,11 @@ end
 ---------------------------------------------------------------------
 local D = { hue = 0.6, transparency = 0, lock = false, flight = 5, jump = 50, walk = 16, fov = 70, spin = 100, bg = 1, guiScale = 100, corner = 14, sbRight = false, font = 1, textSize = 100,
 	anim = 100, dragW = 60, espTeam = 216, espEnemy = 0, fpsColor = 1, fpsPos = 1, key = "RightShift",
-	dashPow = 90, dashCd = 10, wcSpeed = 25, followDist = 6, url = "", pins = {}, notify = true, fcSpeed = 60,
+	dashPow = 90, dashCd = 10, wcSpeed = 25, followDist = 6, url = "", pins = {}, notify = true, fcSpeed = 60, roleFilter = 1,
 	sprintMul = 18, xrayT = 60, soundVol = 50, sound = false, camMode = 1, sky = 1, favs = {} }
 local S = {}
 for k, v in pairs(D) do S[k] = v end
-local F = { roles = false, plat = false, sprint = false, xray = false, chatCmd = false, wc = false, stats = false, alerts = false, hide = false, rainbow = false, glow = false, fg = false, ctp = false, sit = false, afk = false, spin = false, fb = false, fpsb = false, fly = false, noclip = false, inf = false, jp = false, ws = false, grav = false, esp = false, fps = false,
+local F = { grabGun = false, dodge = false, infcam = false, roles = false, plat = false, sprint = false, xray = false, chatCmd = false, wc = false, stats = false, alerts = false, hide = false, rainbow = false, glow = false, fg = false, ctp = false, sit = false, afk = false, spin = false, fb = false, fpsb = false, fly = false, noclip = false, inf = false, jp = false, ws = false, grav = false, esp = false, fps = false,
 	fovActive = false, fovReturn = false }
 
 local conns, cleanups = {}, {}
@@ -137,7 +137,7 @@ clickFn = function()
 	end
 end
 
-local W, H = 720, 360
+local W, H = 560, 420
 local shadow = new("Frame", { AnchorPoint = Vector2.new(0.5, 0.5), Size = UDim2.fromOffset(W, H), BackgroundTransparency = 1 }, gui)
 local shadowScale = new("UIScale", { Scale = 0.9 }, shadow)
 local sh1 = new("Frame", { Position = UDim2.fromOffset(-18, -12), Size = UDim2.fromOffset(W + 36, H + 38), BackgroundColor3 = Color3.new(0, 0, 0),
@@ -328,7 +328,7 @@ end
 -- tabs with a sliding highlight
 local switchTo
 local TAB_H, TAB_STEP = 28, 31
-local mainTabs = { { "Main", "\240\159\143\160" }, { "Player", "\240\159\145\164" }, { "Visuals", "\240\159\142\165" }, { "Server", "\240\159\140\144" }, { "Customize", "\240\159\142\168" }, { "Settings", "\226\154\153" } }
+local mainTabs = { { "Main", "\240\159\143\160" }, { "Player", "\240\159\145\164" }, { "Visuals", "\240\159\142\165" }, { "Murder Mystery 2", "\240\159\148\170" }, { "Server", "\240\159\140\144" }, { "Customize", "\240\159\142\168" }, { "Settings", "\226\154\153" } }
 local utilTabs = { { "Favorites", "\226\152\133" }, { "Search", "\240\159\148\141" }, { "Changelog", "\240\159\147\139" } }
 local tabIndex, catBtns = {}, {}
 local tabHolder = new("Frame", { Position = UDim2.fromOffset(0, 48), Size = UDim2.new(1, 0, 0, #mainTabs * TAB_STEP), BackgroundTransparency = 1 }, sidebar)
@@ -641,7 +641,8 @@ local function pickerFor(c, box)
 	end
 	btn.MouseButton1Click:Connect(function() setOpen(not open) end)
 end
-local mainSc, playerSc, visSc, serverSc, custSc, favSc, searchSc, chgSc, setSc = makePage("Main", 100), makePage("Player", 100), makePage("Visuals", 100), makePage("Server", 100), makePage("Customize", 100), makePage("Favorites"), makePage("Search"), makePage("Changelog"), makePage("Settings", 100)
+local TWOCOL = W >= 640
+local mainSc, playerSc, visSc, mm2Sc, serverSc, custSc, favSc, searchSc, chgSc, setSc = makePage("Main", TWOCOL and 100 or nil), makePage("Player", TWOCOL and 100 or nil), makePage("Visuals", TWOCOL and 100 or nil), makePage("Murder Mystery 2", TWOCOL and 100 or nil), makePage("Server", TWOCOL and 100 or nil), makePage("Customize", TWOCOL and 100 or nil), makePage("Favorites"), makePage("Search"), makePage("Changelog"), makePage("Settings", TWOCOL and 100 or nil)
 local function section(sc, text, order)
 	local l = txt(colFor(sc, order), { Text = text, Size = UDim2.new(1, 0, 0, 28), LayoutOrder = order, Font = Enum.Font.GothamBold, TextSize = 15,
 		TextColor3 = TEXT, TextYAlignment = Enum.TextYAlignment.Top })
@@ -656,6 +657,7 @@ section(visSc, "Players", 0); section(visSc, "Camera", 3); section(visSc, "World
 section(serverSc, "Connection", 0); section(serverSc, "Performance", 5); section(serverSc, "Extras", 100)
 section(custSc, "Theme", 0); section(custSc, "Layout", 6); section(custSc, "Motion and input", 100); section(custSc, "Overlay colors", 110); section(custSc, "Shortcuts", 120)
 section(setSc, "Behavior", 0); section(setSc, "Data", 100)
+section(mm2Sc, "ESP", 0); section(mm2Sc, "Teleport", 3); section(mm2Sc, "Helpers", 6)
 local ctl = {}
 ctl.baseGrav = workspace.Gravity
 ctl.espTeam, ctl.espEnemy = Color3.fromHSV(0.6, 0.73, 1), Color3.fromHSV(0, 0.73, 1)
@@ -938,12 +940,37 @@ do
 	cardLabel(c, "ESP", "Names, distance and outlines through walls. Blue = team, red = enemy.")
 	makeToggle(c, function(v) F.esp = v end)
 
-	local cR = card(visSc, 56, 1)
+	local cR = card(mm2Sc, 56, 1)
 	cardLabel(cR, "Role ESP", "Murder Mystery 2: murderer red, sheriff blue, innocent green.")
 	makeToggle(cR, function(v)
 		F.roles = v
 		if v and TG["esp"] and not TG["esp"].state then TG["esp"].Set(true) end
 	end)
+
+	local ROLEOPTS = { "Everyone", "Innocents", "Sheriff", "Murderer" }
+	ctl.ROLEOPTS = ROLEOPTS
+	local cS = card(mm2Sc, 40, 2)
+	cardLabel(cS, "Show roles")
+	ctl.roleDrop = dropBtn(cS, 150, ROLEOPTS[1], ROLEOPTS, function(i)
+		S.roleFilter = i
+		ctl.roleDrop.Text = ROLEOPTS[i]
+	end)
+
+	local cT = card(mm2Sc, 40, 4)
+	cardLabel(cT, "Teleport to")
+	for i, role in ipairs({ "Murderer", "Sheriff" }) do
+		local tb = button(cT, { Text = role, AnchorPoint = Vector2.new(1, 0), Position = UDim2.new(1, -12 - (i - 1) * 82, 0, 7), Size = UDim2.fromOffset(76, 26),
+			BackgroundColor3 = Color3.fromRGB(46, 46, 58), TextSize = 11 })
+		tb.MouseButton1Click:Connect(function() ctl.tpRole(role) end)
+	end
+
+	local cG = card(mm2Sc, 56, 7)
+	cardLabel(cG, "Auto Grab Gun", "Grabs the gun the moment the sheriff dies.")
+	makeToggle(cG, function(v) F.grabGun = v end)
+
+	local cD = card(mm2Sc, 56, 8)
+	cardLabel(cD, "Dodge Sword", "Sidesteps thrown knives that head toward you.")
+	makeToggle(cD, function(v) F.dodge = v end)
 
 	local c2 = card(visSc, 40, 111)
 	cardLabel(c2, "FPS Counter")
@@ -987,6 +1014,10 @@ do
 	local c8 = card(visSc, 56, 7)
 	cardLabel(c8, "Noclip Camera", "The camera passes through walls so you can look through them.")
 	makeToggle(c8, function(v) ctl.camNoclip(v) end)
+
+	local cIC = card(visSc, 56, 8)
+	cardLabel(cIC, "Infinity Camera", "Zoom the camera out as far as you want.")
+	makeToggle(cIC, function(v) ctl.infCam(v) end)
 
 	local c9 = card(visSc, 68, 102)
 	cardLabel(c9, "X-Ray")
@@ -1254,7 +1285,12 @@ do
 		txt(c, { Text = table.concat(lines, "\n"), Size = UDim2.new(1, 0, 0, 0), AutomaticSize = Enum.AutomaticSize.Y, TextWrapped = true, TextSize = 11,
 			TextColor3 = DIM, TextYAlignment = Enum.TextYAlignment.Top, LayoutOrder = 1 })
 	end
-	chg(-4, "V12 (latest)", {
+	chg(-5, "V13 (latest)", {
+		"- New Murder Mystery 2 tab: Role ESP with a role filter, Teleport to murderer or sheriff, Auto Grab Gun, Dodge Sword",
+		"- Infinity Camera: zoom out as far as you want",
+		"- New in-between window shape (centered, single column)",
+	})
+	chg(-4, "V12", {
 		"- Visual overhaul: soft window shadow, glossy sheen, animated accent line",
 		"- Cards: depth gradient, glowing edge bar and toggle glow when a feature is on",
 		"- Headings with accent underline, hover lift on buttons, glowing slider knob",
@@ -1830,8 +1866,14 @@ connect(RunService.Heartbeat, function()
 				local hpf = (eh and eh.MaxHealth > 0) and math.clamp(eh.Health / eh.MaxHealth, 0, 1) or 1
 				tw(e.hpFill, 0.2, { Size = UDim2.new(hpf, 0, 1, 0), BackgroundColor3 = Color3.fromHSV(hpf * 0.33, 0.8, 1) })
 				e.bot.Text = math.floor(dist + 0.5) .. " studs  \194\183  " .. (eh and math.floor(eh.Health + 0.5) or 0) .. " HP"
+				local show = true
+				if F.roles then
+					local f = S.roleFilter
+					if f == 2 then show = roleTxt == "Innocent" elseif f == 3 then show = roleTxt == "Sheriff" elseif f == 4 then show = roleTxt == "Murderer" end
+				end
+				e.hl.Enabled, e.bb.Enabled = show, show
 				local sp, on = c:WorldToViewportPoint(e.head.Position)
-				if on then table.insert(items, { e = e, d = dist, x = sp.X, y = sp.Y }) end
+				if on and show then table.insert(items, { e = e, d = dist, x = sp.X, y = sp.Y }) end
 			end
 		end
 	end
@@ -2477,12 +2519,13 @@ do
 		pcall(function()
 			if i == 1 then
 				LP.CameraMode, LP.CameraMinZoomDistance, LP.CameraMaxZoomDistance = cmOrig[1], cmOrig[2], cmOrig[3]
+				if F.infcam then LP.CameraMaxZoomDistance = 1e5 end
 			elseif i == 2 then
 				LP.CameraMode = Enum.CameraMode.LockFirstPerson
 			else
 				LP.CameraMode = Enum.CameraMode.Classic
 				LP.CameraMinZoomDistance = 12
-				LP.CameraMaxZoomDistance = math.max(cmOrig[3], 30)
+				LP.CameraMaxZoomDistance = F.infcam and 1e5 or math.max(cmOrig[3], 30)
 			end
 		end)
 	end
@@ -2572,6 +2615,137 @@ do
 	table.insert(cleanups, function() pcall(function() RunService:UnbindFromRenderStep("VisionXDashFx") end) end)
 end
 
+-- Murder Mystery 2 helpers + Infinity Camera
+do
+	-- Infinity Camera
+	local icOrig
+	function ctl.infCam(on)
+		F.infcam = on
+		pcall(function()
+			if on then
+				icOrig = icOrig or { LP.CameraMinZoomDistance, LP.CameraMaxZoomDistance }
+				LP.CameraMaxZoomDistance = 1e5
+			elseif icOrig then
+				LP.CameraMinZoomDistance, LP.CameraMaxZoomDistance = icOrig[1], icOrig[2]
+				icOrig = nil
+			end
+		end)
+	end
+	local icAcc = 0
+	connect(RunService.Heartbeat, function(dt)
+		icAcc += dt
+		if icAcc < 0.5 then return end
+		icAcc = 0
+		if F.infcam then pcall(function() LP.CameraMaxZoomDistance = 1e5 end) end
+	end)
+	table.insert(cleanups, function() if F.infcam then ctl.infCam(false) end end)
+
+	-- Teleport to murderer / sheriff
+	local function findRole(role)
+		for _, p in ipairs(Players:GetPlayers()) do
+			if p ~= LP then
+				local rt = mm2Role(p)
+				if rt == role then return p end
+			end
+		end
+	end
+	function ctl.tpRole(role)
+		local p = findRole(role)
+		local r = hrp()
+		local tr = p and p.Character and p.Character:FindFirstChild("HumanoidRootPart")
+		if not (r and tr) then
+			ctl.toast("No " .. role:lower() .. " found", Color3.fromRGB(255, 100, 100))
+			return
+		end
+		r.CFrame = tr.CFrame * CFrame.new(0, 0, 4)
+		ctl.toast("Teleported to the " .. role:lower(), GREEN)
+	end
+	ACT["tp sheriff"] = function() ctl.tpRole("Sheriff") end
+	ACT["tp murderer"] = function() ctl.tpRole("Murderer") end
+
+	-- Auto Grab Gun: picks up the dropped gun as soon as the sheriff dies
+	local grabbing = false
+	local function grabGun()
+		if not F.grabGun or grabbing then return end
+		local drop = workspace:FindFirstChild("GunDrop")
+		local r = hrp()
+		if not (drop and drop:IsA("BasePart") and r) then return end
+		local ch, bp = LP.Character, LP:FindFirstChildOfClass("Backpack")
+		if (ch and ch:FindFirstChild("Knife")) or (bp and bp:FindFirstChild("Knife")) then return end -- murderers skip it
+		grabbing = true
+		local back = r.CFrame
+		pcall(function()
+			if firetouchinterest then
+				firetouchinterest(r, drop, 0)
+				task.wait(0.05)
+				firetouchinterest(r, drop, 1)
+			else
+				r.CFrame = drop.CFrame + Vector3.new(0, 2, 0)
+				task.wait(0.35)
+				r.CFrame = back
+			end
+		end)
+		task.wait(0.5)
+		grabbing = false
+	end
+	connect(workspace.DescendantAdded, function(d)
+		if F.grabGun and d.Name == "GunDrop" then task.defer(grabGun) end
+	end)
+	local gAcc = 0
+	connect(RunService.Heartbeat, function(dt)
+		gAcc += dt
+		if gAcc < 0.3 then return end
+		gAcc = 0
+		if F.grabGun then task.spawn(grabGun) end
+	end)
+
+	-- Dodge Sword: sidestep a thrown knife that is flying toward you
+	local knives, lastDodge = {}, 0
+	local function isKnife(d)
+		if not d:IsA("BasePart") or not string.find(string.lower(d.Name), "knife", 1, true) then return false end
+		local m = d:FindFirstAncestorOfClass("Model")
+		if m and m:FindFirstChildOfClass("Humanoid") then return false end -- a knife someone is holding
+		if d:FindFirstAncestorOfClass("Tool") then return false end
+		return true
+	end
+	connect(workspace.DescendantAdded, function(d)
+		if F.dodge and isKnife(d) then knives[d] = { pos = d.Position, t = os.clock() } end
+	end)
+	connect(workspace.DescendantRemoving, function(d) knives[d] = nil end)
+	connect(RunService.Heartbeat, function()
+		if not F.dodge then
+			if next(knives) then knives = {} end
+			return
+		end
+		local r = hrp()
+		if not r then return end
+		local now = os.clock()
+		for part, info in pairs(knives) do
+			if not part.Parent then
+				knives[part] = nil
+			else
+				local dt = now - info.t
+				if dt > 0 then
+					local vel = (part.Position - info.pos) / dt
+					info.pos, info.t = part.Position, now
+					if vel.Magnitude > 25 and now - lastDodge > 0.4 then
+						local toMe = r.Position - part.Position
+						if toMe.Magnitude < 80 and vel.Unit:Dot(toMe.Unit) > 0.88 then
+							local side = vel.Unit:Cross(Vector3.yAxis)
+							if side.Magnitude > 0.01 then
+								side = side.Unit
+								if toMe:Dot(side) < 0 then side = -side end
+								lastDodge = now
+								r.CFrame = r.CFrame + side * 7
+							end
+						end
+					end
+				end
+			end
+		end
+	end)
+end
+
 -- Save / load settings
 local SAVE_FILE = "VisionX_settings.json"
 function ctl.save()
@@ -2581,7 +2755,7 @@ function ctl.save()
 		textSize = S.textSize, anim = S.anim, dragW = S.dragW, espTeam = S.espTeam, espEnemy = S.espEnemy, fpsColor = S.fpsColor,
 		fpsPos = S.fpsPos, key = S.key, dashPow = S.dashPow, dashCd = S.dashCd, wcSpeed = S.wcSpeed, fcSpeed = S.fcSpeed, followDist = S.followDist,
 		url = S.url, autoRe = TG["auto re-execute"] and TG["auto re-execute"].state or false, pins = S.pins,
-		sprintMul = S.sprintMul, xrayT = S.xrayT, soundVol = S.soundVol, sound = S.sound, camMode = S.camMode, sky = S.sky, favs = S.favs, chatCmd = F.chatCmd, notify = S.notify }
+		sprintMul = S.sprintMul, xrayT = S.xrayT, soundVol = S.soundVol, sound = S.sound, camMode = S.camMode, sky = S.sky, favs = S.favs, chatCmd = F.chatCmd, notify = S.notify, roleFilter = S.roleFilter }
 	return (pcall(function() writefile(SAVE_FILE, HttpService:JSONEncode(data)) end))
 end
 function ctl.load()
@@ -2613,6 +2787,10 @@ function ctl.load()
 		if tonumber(v) and SL[lbl] then SL[lbl].Set(v) end
 	end
 	if data.sound ~= nil and TG["click sounds"] then TG["click sounds"].Set(data.sound == true) end
+	if tonumber(data.roleFilter) and ctl.roleDrop and ctl.ROLEOPTS[data.roleFilter] then
+		S.roleFilter = data.roleFilter
+		ctl.roleDrop.Text = ctl.ROLEOPTS[data.roleFilter]
+	end
 	if data.notify ~= nil and TG["notifications"] then
 		S.notify = data.notify == true
 		TG["notifications"].Set(S.notify, true)
@@ -2687,7 +2865,7 @@ do
 		ctp = "click tp", clicktp = "click tp", esp = "esp", fps = "fps counter", fpscounter = "fps counter",
 		fullbright = "fullbright", fb = "fullbright", freecam = "freecam", fc = "freecam", fpsboost = "fps boost", boost = "fps boost",
 		lock = "position lock", positionlock = "position lock", rainbow = "rainbow mode", glow = "glow border", wc = "wall climb", wallclimb = "wall climb",
-		stats = "stats overlay", alerts = "join/leave alerts", hide = "hide players", hideplayers = "hide players", noclipcam = "noclip camera", camnoclip = "noclip camera",
+		stats = "stats overlay", alerts = "join/leave alerts", hide = "hide players", hideplayers = "hide players", noclipcam = "noclip camera", camnoclip = "noclip camera", infcam = "infinity camera", grabgun = "auto grab gun", dodge = "dodge sword",
 		plat = "platform", platform = "platform", sprint = "sprint boost", xray = "x-ray", sounds = "click sounds", clicksounds = "click sounds",
 		chat = "chat commands", roles = "role esp", flingguard = "fling guard", antifling = "fling guard", fg = "fling guard",
 	}
@@ -2745,6 +2923,10 @@ do
 			return "Usage: sky default | sunset | night | galaxy | overcast | pink | bright", false
 		end
 
+		if cmd == "tp" and (rest:lower() == "sheriff" or rest:lower() == "murderer") then
+			ctl.tpRole(rest:lower() == "sheriff" and "Sheriff" or "Murderer")
+			return "Teleporting to " .. rest:lower(), true
+		end
 		if cmd == "tp" or cmd == "spec" or cmd == "spectate" then
 			if rest == "" then return "Type a player name", false end
 			local p = ctl.find(rest)
