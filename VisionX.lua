@@ -3494,7 +3494,7 @@ local function minimize()
 		bScale.Scale = 0.2
 		tw(bScale, 0.32, { Scale = 1 }, B)
 	end)
-	task.delay(0.34 / ANIM, function() main.Visible = false busy = false end)
+	task.delay(0.34 / ANIM, function() main.Visible = false; busy = false end)
 end
 local function restore()
 	if busy or not minimized or closed then return end
