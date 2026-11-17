@@ -31,7 +31,6 @@ Paste it into your executor and run it while in a game.
 ## Notes
 
 - Works best on mobile executors, but also runs on PC.
-- Use at your own risk. Using scripts in Roblox can get your account banned.
 
 ## Credits
 
