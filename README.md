@@ -1,21 +1,12 @@
 # Vision X
 
-A clean, mobile-friendly Roblox script hub with a floating navigation bar.
+Universal script
 
-## Run it
+## Loadstring
 
 ```lua
 loadstring(game:HttpGet("https://raw.githubusercontent.com/realsens1/Vision-X/refs/heads/main/VisionX.lua"))()
 ```
-
-Paste it into your executor and run it while in a game.
-
-## How to use
-
-- A floating bar appears at the bottom of your screen. Drag it anywhere.
-- Tap a tab (Main, Player, Visuals, Server) to open that page above the bar.
-- Tap **X** to close the page. The bar stays.
-- Tap **•••** for more pages (Customize, Settings, Favorites, Search, Changelog) and to unload the script.
 
 ## Features
 
@@ -30,8 +21,8 @@ Paste it into your executor and run it while in a game.
 
 ## Notes
 
-- Works best on mobile executors, but also runs on PC.
+- Works best on mobile executors, but also runs on PC
 
 ## Credits
 
-Made by realsens1.
+Made by realsens1, realsens1 on discord
